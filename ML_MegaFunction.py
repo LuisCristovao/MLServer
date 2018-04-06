@@ -24,7 +24,7 @@ import pandas as pd
 #from sklearn.neighbors import KNeighborsClassifier
 #from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 #from sklearn.naive_bayes import GaussianNB
-from sklearn import preprocessing
+#from sklearn import preprocessing
 
 import sklearn as sk
 
@@ -34,7 +34,7 @@ class Predictor:
     score=0
     @staticmethod
     def categoricalToNumeric(array):
-        le = preprocessing.LabelEncoder()
+        le = sk.preprocessing.LabelEncoder()
         le.fit(array)
         return le.transform(array)
     
