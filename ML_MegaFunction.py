@@ -11,7 +11,7 @@ datasets. The Values of data set must be numeric or categorical (string)
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn import svm
 from sklearn import datasets
