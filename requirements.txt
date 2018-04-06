@@ -3,3 +3,4 @@ paste
 sklearn
 numpy
 pandas
+scipy
