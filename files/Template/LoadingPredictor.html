@@ -84,7 +84,7 @@ function repeatHttpRequest(){
 				document.getElementById("start").innerHTML="Done!"
 				//console.log("Entrou");
 				out="Predictor.html";
-				window.location.replace("http://localhost/Predictor.html");
+				setTimeout(function(){window.location.replace("http://localhost/Predictor.html");},1000);
 			}
 		}
 	  };
