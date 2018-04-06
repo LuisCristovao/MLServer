@@ -11,22 +11,21 @@ datasets. The Values of data set must be numeric or categorical (string)
 
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
-#from sklearn.linear_model import LogisticRegression
-#from sklearn import svm
-#from sklearn import datasets
-#from pandas.plotting import scatter_matrix
-#from sklearn import model_selection
-#from sklearn.metrics import classification_report
-#from sklearn.metrics import confusion_matrix
-#from sklearn.metrics import accuracy_score
-#from sklearn.tree import DecisionTreeClassifier
-#from sklearn.neighbors import KNeighborsClassifier
-#from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-#from sklearn.naive_bayes import GaussianNB
-#from sklearn import preprocessing
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn import svm
+from sklearn import datasets
+from pandas.plotting import scatter_matrix
+from sklearn import model_selection
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.naive_bayes import GaussianNB
+from sklearn import preprocessing
 
-import sklearn as sk
 
 class Predictor:
     
@@ -34,7 +33,7 @@ class Predictor:
     score=0
     @staticmethod
     def categoricalToNumeric(array):
-        le = sk.preprocessing.LabelEncoder()
+        le = preprocessing.LabelEncoder()
         le.fit(array)
         return le.transform(array)
     
@@ -77,30 +76,30 @@ class Predictor:
         X=array[:,0:class_index]
         Y = array[:,class_index]
         #print(Y)
-        X_train, X_validation, Y_train, Y_validation = sk.model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+        X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
         self.loading=str(15)+'%'
         scoring = 'accuracy'
     
         # Spot Check Algorithms
         models = []
-        models.append(('LR', sk.LogisticRegression()))
+        models.append(('LR', LogisticRegression()))
         self.loading=str(20)+'%'
-        models.append(('LDA', sk.LinearDiscriminantAnalysis()))
+        models.append(('LDA', LinearDiscriminantAnalysis()))
         self.loading=str(30)+'%'
-        models.append(('KNN', sk.KNeighborsClassifier()))
+        models.append(('KNN', KNeighborsClassifier()))
         self.loading=str(40)+'%'
-        models.append(('CART', sk.DecisionTreeClassifier()))
+        models.append(('CART', DecisionTreeClassifier()))
         self.loading=str(50)+'%'
-        models.append(('NB', sk.GaussianNB()))
+        models.append(('NB', GaussianNB()))
         self.loading=str(70)+'%'
         if(dataset.shape[0]<SVM_data_size):
-            models.append(('SVM', sk.svm.SVC()))
+            models.append(('SVM', svm.SVC()))
         # evaluate each model in turn
         self.loading=str(80)+'%'
         mean_results=[]
         for name, model in models:
-            kfold = sk.model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
-            cv_results = sk.model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+            kfold = model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
+            cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
             mean_results.append(cv_results.mean())
             msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
             print(msg)
@@ -120,17 +119,17 @@ class Predictor:
         TrueX=Truearray[:,0:class_index]
         TrueY=Truearray[:,class_index]
         predictions = best_model.predict(TrueX)
-        print('\n\nTrue Score: ',sk.accuracy_score(TrueY, predictions))
-        print('Cunfusuion Matrix \n',sk.confusion_matrix(TrueY, predictions))
+        print('\n\nTrue Score: ',accuracy_score(TrueY, predictions))
+        print('Cunfusuion Matrix \n',confusion_matrix(TrueY, predictions))
         #print(classification_report(TrueY, predictions))
         self.loading=str(95)+'%'
         FFArray=dataset.values
         FFX=FFArray[:,0:class_index]
         FFY=FFArray[:,class_index]
         predictions = best_model.predict(FFX)
-        self.score=sk.accuracy_score(FFY, predictions)
+        self.score=accuracy_score(FFY, predictions)
         print('\n\nFinal Final Score: ',self.score)
-        print('Confusion matrix\n',sk.confusion_matrix(FFY, predictions))
+        print('Confusion matrix\n',confusion_matrix(FFY, predictions))
         self.loading=str(100)+'%'
         return best_model
     

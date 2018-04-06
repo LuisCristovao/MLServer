@@ -12,124 +12,10 @@ import pandas as pd
 import numpy as np
 import os
 #import time
-#import ML_MegaFunction as ml
+import ML_MegaFunction as ml
 import threading
 from sys import argv
 #import sqlite3
-
-#########################################################################################
-import sklearn as sk
-
-class Predictor:
-    
-    loading=str(0)+'%'
-    score=0
-    @staticmethod
-    def categoricalToNumeric(array):
-        le = sk.preprocessing.LabelEncoder()
-        le.fit(array)
-        return le.transform(array)
-    
-    
-    def TurnDatasetToNumeric(self,dataset):
-        
-        for i in range(len(dataset.dtypes)):
-            if dataset.dtypes[i]==object:
-                v=dataset.iloc[:,i].values
-                #print(v)
-                v=self.categoricalToNumeric(v)
-                dataset.iloc[:,i]=v
-        
-        return dataset
-    
-    
-    def ReturnPredictor(self,dataset,true_test_size=0.5,validation_size=0.20,cross_val_splits=10,seed=7,SVM_data_size=1000):
-        '''
-        dataset must have this format: Atribute1|Atribute2|...|Class|
-        the atributes must be numerical! the class doesn't
-        '''
-        class_index=dataset.shape[1]-1
-        #Shuffle data
-        dataset=dataset.sample(frac=1,random_state=seed)
-        #print(dataset.head)
-        self.loading=str(5)+'%'
-        
-         #Turn all columns of atributes that have string categorical values to numbers
-        dataset.iloc[:,:-1]=self.TurnDatasetToNumeric(dataset.iloc[:,:-1])
-        self.loading=str(10)+'%'
-        
-        #Divide dataset in two parts
-        size=dataset.shape[0]
-        half=int(size*true_test_size)
-        #Division
-        TrainValSet=dataset.iloc[:half]
-        TrueErrorSet=dataset.iloc[half:]
-    	#Train Validation Part-----------------------------------------------------
-        array = TrainValSet.values
-        X=array[:,0:class_index]
-        Y = array[:,class_index]
-        #print(Y)
-        X_train, X_validation, Y_train, Y_validation = sk.model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
-        self.loading=str(15)+'%'
-        scoring = 'accuracy'
-    
-        # Spot Check Algorithms
-        models = []
-        models.append(('LR', sk.LogisticRegression()))
-        self.loading=str(20)+'%'
-        models.append(('LDA', sk.LinearDiscriminantAnalysis()))
-        self.loading=str(30)+'%'
-        models.append(('KNN', sk.KNeighborsClassifier()))
-        self.loading=str(40)+'%'
-        models.append(('CART', sk.DecisionTreeClassifier()))
-        self.loading=str(50)+'%'
-        models.append(('NB', sk.GaussianNB()))
-        self.loading=str(70)+'%'
-        if(dataset.shape[0]<SVM_data_size):
-            models.append(('SVM', sk.svm.SVC()))
-        # evaluate each model in turn
-        self.loading=str(80)+'%'
-        mean_results=[]
-        for name, model in models:
-            kfold = sk.model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
-            cv_results = sk.model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
-            mean_results.append(cv_results.mean())
-            msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-            print(msg)
-        self.loading=str(90)+'%'    
-        mean_results=np.array(mean_results)	
-        best_model_index=mean_results.argmax()
-        best_model=models[best_model_index][1]
-        print("Best Model: ",models[best_model_index][0])
-    	
-        ##Fit best model In Training_validation dataset
-        finalArray=TrainValSet.values
-        finalX=finalArray[:,:class_index]
-        finalY=finalArray[:,class_index] 
-        best_model.fit(finalX,finalY)
-    	
-        Truearray=TrueErrorSet.values
-        TrueX=Truearray[:,0:class_index]
-        TrueY=Truearray[:,class_index]
-        predictions = best_model.predict(TrueX)
-        print('\n\nTrue Score: ',sk.accuracy_score(TrueY, predictions))
-        print('Cunfusuion Matrix \n',sk.confusion_matrix(TrueY, predictions))
-        #print(classification_report(TrueY, predictions))
-        self.loading=str(95)+'%'
-        FFArray=dataset.values
-        FFX=FFArray[:,0:class_index]
-        FFY=FFArray[:,class_index]
-        predictions = best_model.predict(FFX)
-        self.score=sk.accuracy_score(FFY, predictions)
-        print('\n\nFinal Final Score: ',self.score)
-        print('Confusion matrix\n',sk.confusion_matrix(FFY, predictions))
-        self.loading=str(100)+'%'
-        return best_model
-    
-
-########################################################################################
-
-
 
 
 secret='some-secret-key'
@@ -147,7 +33,7 @@ class Client:
     def __init__(self,username,password):
         self.username=username
         self.password=password
-        self.p=Predictor()
+        self.p=ml.Predictor()
         
     def Run(self):
         self.predictor=self.p.ReturnPredictor(self.dataset)
@@ -175,14 +61,7 @@ class Client:
 #   return data
 
 #for db        
-#def getUsersDB():
-#    conn = sqlite3.connect('users.db')
-#    c = conn.cursor()
-#    c.execute("SELECT username, password FROM users")
-#    result = c.fetchall()
-##    print(result[0][0])
-#    c.close()
-#    return result
+
 
 
 def validate_user(secret):
@@ -203,28 +82,6 @@ def validate_user(secret):
 #    return False
 
 #For db
-#def check_login(username,password):
-#    conn = sqlite3.connect('users.db')
-#    c = conn.cursor()
-#    c.execute("SELECT username, password FROM users where username='"+username+"' and password='"+password+"'")
-#    result = c.fetchall()
-#    if result:
-#        return True
-#    else:
-#        return False
-#
-#def SignUp(username,password):
-#    conn = sqlite3.connect('users.db')
-##    c = conn.cursor()
-#    try:
-#        conn.execute("INSERT INTO users (username,password) VALUES ('"+username+"','"+password+"')")
-#        conn.commit()
-#    except:
-#        return False
-#    
-#    return True 
-
-
 def SignUp(username,password):
     global clients
     #if already exists
@@ -248,7 +105,7 @@ def check_login(username,password):
         else:
             return False
     else:
-        return False                
+        return False              
 
 #_______Main___________________________
 #txt version##########################
@@ -393,7 +250,7 @@ def Loading():
 
 #It gets here the program from loadingpredicto.html that after loading  goes to Predictor.html  who sends prediction request
 @bt.get('/Prediction')
-def Predictor1():
+def Predictor():
      global clients
      
      for c in clients:
