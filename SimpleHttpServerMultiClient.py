@@ -226,9 +226,10 @@ def GetPredictor():
         if key:
             #Valid User
             #client_username=c #=clients[c].username #
-            t=threading.Thread(target=clients[c].Run)
-            clients_run_threads[c]=t
-            t.start()
+            #t=threading.Thread(target=clients[c].Run)
+            #clients_run_threads[c]=t
+            #t.start()
+            clients[c].Run()
             return "Started the Proccess!"
             
     return "You are not logged in. Access denied."
@@ -244,6 +245,7 @@ def Loading():
 #                return clients[c].p.loading
 #            else:
 #                return bt.redirect("/Predictor.html")
+            print('Loading->',clients[c].Loading())
             return clients[c].Loading()
     
     return "You are not logged in. Access denied."
