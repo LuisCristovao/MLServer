@@ -50,7 +50,7 @@ class Predictor:
         return dataset
     
     
-    def ReturnPredictor(self,dataset,true_test_size=0.5,validation_size=0.20,cross_val_splits=10,seed=7,SVM_data_size=1000):
+    def ReturnPredictor(self,dataset,true_test_size=0.8,validation_size=0.20,cross_val_splits=10,seed=7,SVM_data_size=1000):
         '''
         dataset must have this format: Atribute1|Atribute2|...|Class|
         the atributes must be numerical! the class doesn't
