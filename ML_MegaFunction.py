@@ -31,7 +31,7 @@ class Predictor:
     
     loading=str(0)+'%'
     score=0
-	best_model_str=""
+    best_model_str=""
     @staticmethod
     def categoricalToNumeric(array):
         le = preprocessing.LabelEncoder()
