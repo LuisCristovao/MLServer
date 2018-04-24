@@ -267,7 +267,7 @@ def Predictor():
             clients[c].examples=data
             n=10
             output="SCORE:"+str(ml_instance.score)+"<br>"
-            output+="Best Model: "+client[c].p.best_model_str+"<br>"
+            output+="Best Model: "+clients[c].p.best_model_str+"<br>"
             output+="Original values:<br>"
             output+=np.array_str(data.iloc[:n,:].values)
             output+="<br><br>"
