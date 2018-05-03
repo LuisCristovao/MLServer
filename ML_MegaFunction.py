@@ -113,7 +113,7 @@ class Predictor:
         best_model_index=mean_results.argmax()
         best_model=models[best_model_index][1]
         print("Best Model: ",models[best_model_index][0])
-		
+        self.best_model_str=""
         self.best_model_str+=models[best_model_index][0]
     	
         ##Fit best model In Training_validation dataset
