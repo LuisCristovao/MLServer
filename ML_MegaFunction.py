@@ -99,7 +99,7 @@ class Predictor:
         self.loading=str(20)+'%'
         mean_results=[]
         model_index=0
-        actual_loading=20
+        prev_loading=20
         for name, model in models:
             kfold = model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
             cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
@@ -107,7 +107,7 @@ class Predictor:
             msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
             print(msg)
             model_index+=1
-            self.loading=str(actual_loading+10*model_index)+'%'
+            self.loading=str(prev_loading + 10*model_index)+'%'
         self.loading=str(90)+'%'    
         mean_results=np.array(mean_results)	
         best_model_index=mean_results.argmax()
