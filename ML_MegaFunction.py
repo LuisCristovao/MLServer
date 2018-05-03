@@ -107,7 +107,7 @@ class Predictor:
             msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
             print(msg)
             model_index+=1
-            self.loading=str(actual_loading*10*model_index)
+            self.loading=str(actual_loading+10*model_index)+'%'
         self.loading=str(90)+'%'    
         mean_results=np.array(mean_results)	
         best_model_index=mean_results.argmax()
