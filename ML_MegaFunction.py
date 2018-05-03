@@ -84,26 +84,30 @@ class Predictor:
         # Spot Check Algorithms
         models = []
         models.append(('LR', LogisticRegression()))
-        self.loading=str(20)+'%'
+        #self.loading=str(20)+'%'
         models.append(('LDA', LinearDiscriminantAnalysis()))
-        self.loading=str(30)+'%'
+        #self.loading=str(30)+'%'
         models.append(('KNN', KNeighborsClassifier()))
-        self.loading=str(40)+'%'
+        #self.loading=str(40)+'%'
         models.append(('CART', DecisionTreeClassifier()))
-        self.loading=str(50)+'%'
+        #self.loading=str(50)+'%'
         models.append(('NB', GaussianNB()))
-        self.loading=str(70)+'%'
+        #self.loading=str(70)+'%'
         if(dataset.shape[0]<SVM_data_size):
             models.append(('SVM', svm.SVC()))
         # evaluate each model in turn
-        self.loading=str(80)+'%'
+        self.loading=str(20)+'%'
         mean_results=[]
+        model_index=0
+        actual_loading=20
         for name, model in models:
             kfold = model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
             cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
             mean_results.append(cv_results.mean())
             msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
             print(msg)
+            model_index+=1
+            self.loading=str(actual_loading*10*model_index)
         self.loading=str(90)+'%'    
         mean_results=np.array(mean_results)	
         best_model_index=mean_results.argmax()
