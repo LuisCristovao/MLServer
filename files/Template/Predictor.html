@@ -20,6 +20,25 @@
         <br>
         <div id="answer">
         </div>
+        <br><br><br>
+        <form action="exportModel" method="post">
+            <input type="submit" value="Export Model" >
+        </form>
+        
+        <div id="exportModelText">
+            <h4>To Export the model do the following:</h4>
+            <ol>
+                <li>Press Export Model button</li>
+                <li>Save <b>model.sav</b> file anywhere you want to use it</li>
+                <li><b>On a python script write the following code, to use the model again :</b></li>
+                <ul>
+                    <li>from sklearn.externals import joblib</li>
+                    <li>loaded_model = joblib.load("filename.sav")</li>
+                    <li>result = loaded_model.score(X_test, Y_test)</li>
+                    <li>#...</li>
+                </ul>
+            </ol>
+        </div>  
         <script>
             document.onload=Main();
             
@@ -95,6 +114,26 @@
                 xhttp.open("POST", "Predict", true);
                 xhttp.send(out);
             }
+            
+            
+            function ExportModel(){
+                var xhttp = new XMLHttpRequest();
+                
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("exportModelText").innerHTML="<h4>Copy the text in </h4><h4>To use the model file write the following code in python:</h4><li>from sklearn.externals import joblib</li><li>loaded_model = joblib.load(filename)</li><li>result = loaded_model.score(X_test, Y_test)</li>"
+                        
+                    }else{
+                        if(this.status==500){
+                            //do request again
+                            document.getElementById("exportModelText").innerHTML="Fail to export model"
+                        }
+                    }
+                };
+                xhttp.open("GET", "exportModel", true);
+                xhttp.send();
+            }
+            
             
             
             

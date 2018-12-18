@@ -55,6 +55,9 @@ class Client:
     def getDatasetFromUrl(self,url,split_caracter=','):
         self.dataset=pd.read_csv(url,sep=split_caracter)
         
+    def SaveModel(self,save_path):
+        self.p.ExportModel(self.predictor,save_path)
+        
 #For TXT file
 #def getUsers():
 #   data = np.genfromtxt('files/Users.txt',dtype=str, delimiter=',')
@@ -265,7 +268,10 @@ def Predictor():
             data.iloc[:,:-1]=ml_instance.TurnDatasetToNumeric(data.iloc[:,:-1])
             data=data.sample(frac=1)
             clients[c].examples=data
-            n=10
+            if(data.shape[0]<10):
+                n=data.shape[0]
+            else:
+                n=10
             output="SCORE:"+str(ml_instance.score)+"<br>"
             output+="Best Model: "+clients[c].p.best_model_str+"<br><br>"
             output+="Original values:<br>"
@@ -329,6 +335,18 @@ def Predict():
             out=p.predict(new_values)
             return str(out)        
 
+@bt.get("/exportModel",method='POST')
+def exportModel():
+    global clients
+    
+    for c in clients:
+        key = bt.request.get_cookie(clients[c].username, secret=secret)
+        if key:
+            newpath = r'files/Template/'+c+'/model.sav' 
+            clients[c].SaveModel(newpath)
+            return bt.static_file('model.sav', root='files/Template/'+c+'/',download=True)
+    
+    return "You are not logged in. Access denied."
         
 
 @bt.get('/<filepath:path>')

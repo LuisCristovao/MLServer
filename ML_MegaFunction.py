@@ -27,6 +27,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn import preprocessing
 
 
+from sklearn.externals import joblib
+
 class Predictor:
     
     loading=str(0)+'%'
@@ -186,7 +188,9 @@ class Predictor:
         self.loading=str(100)+'%'
         return best_model
     
-    
+    @staticmethod
+    def ExportModel(model,path_and_name):
+        joblib.dump(model, path_and_name)
    
 
 #_______________Main____________________________________________________________
