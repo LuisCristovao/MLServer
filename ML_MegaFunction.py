@@ -56,6 +56,13 @@ class Predictor:
         dataset must have this format: Atribute1|Atribute2|...|Class|
         the atributes must be numerical! the class doesn't
         '''
+        
+        
+        if dataset.shape[0]<cross_val_splits:
+            cross_val_splits=2
+        
+        
+        
         class_index=dataset.shape[1]-1
         #Shuffle data
         dataset=dataset.sample(frac=1,random_state=seed)
