@@ -56,13 +56,6 @@ class Predictor:
         dataset must have this format: Atribute1|Atribute2|...|Class|
         the atributes must be numerical! the class doesn't
         '''
-        
-        
-        if dataset.shape[0]<cross_val_splits:
-            cross_val_splits=2
-        
-        
-        
         class_index=dataset.shape[1]-1
         #Shuffle data
         dataset=dataset.sample(frac=1,random_state=seed)
@@ -73,56 +66,102 @@ class Predictor:
         dataset.iloc[:,:-1]=self.TurnDatasetToNumeric(dataset.iloc[:,:-1])
         self.loading=str(10)+'%'
         
-        #Divide dataset in two parts
-        size=dataset.shape[0]
-        half=int(size*true_test_size)
-        #Division
-        TrainValSet=dataset.iloc[:half]
-        TrueErrorSet=dataset.iloc[half:]
-    	#Train Validation Part-----------------------------------------------------
-        array = TrainValSet.values
-        X=array[:,0:class_index]
-        Y = array[:,class_index]
-        #print(Y)
-        X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
-        self.loading=str(15)+'%'
-        scoring = 'accuracy'
-    
-        # Spot Check Algorithms
-        models = []
-        models.append(('LR', LogisticRegression()))
-        #self.loading=str(20)+'%'
-        models.append(('LDA', LinearDiscriminantAnalysis()))
-        #self.loading=str(30)+'%'
-        models.append(('KNN', KNeighborsClassifier()))
-        #self.loading=str(40)+'%'
-        models.append(('CART', DecisionTreeClassifier()))
-        #self.loading=str(50)+'%'
-        models.append(('NB', GaussianNB()))
-        #self.loading=str(70)+'%'
-        if(dataset.shape[0]<SVM_data_size):
+        
+        
+        #if dataset is bigger than 30
+        if(dataset.shape[0]>30):
+            
+            
+            #Divide dataset in two parts
+            size=dataset.shape[0]
+            half=int(size*true_test_size)
+            #Division
+            TrainValSet=dataset.iloc[:half]
+            TrueErrorSet=dataset.iloc[half:]
+        	#Train Validation Part-----------------------------------------------------
+            array = TrainValSet.values
+            X=array[:,0:class_index]
+            Y = array[:,class_index]
+            #print(Y)
+            X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+            self.loading=str(15)+'%'
+            scoring = 'accuracy'
+        
+            # Spot Check Algorithms
+            models = []
+            models.append(('LR', LogisticRegression()))
+            #self.loading=str(20)+'%'
+            models.append(('LDA', LinearDiscriminantAnalysis()))
+            #self.loading=str(30)+'%'
+            models.append(('KNN', KNeighborsClassifier()))
+            #self.loading=str(40)+'%'
+            models.append(('CART', DecisionTreeClassifier()))
+            #self.loading=str(50)+'%'
+            models.append(('NB', GaussianNB()))
+            #self.loading=str(70)+'%'
+            if(dataset.shape[0]<SVM_data_size):
+                models.append(('SVM', svm.SVC()))
+            # evaluate each model in turn
+            self.loading=str(20)+'%'
+            mean_results=[]
+            model_index=0
+            prev_loading=20
+            for name, model in models:
+                kfold = model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
+                cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+                mean_results.append(cv_results.mean())
+                msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+                print(msg)
+                model_index+=1
+                self.loading=str(prev_loading + 10*model_index)+'%'
+            self.loading=str(90)+'%'    
+            mean_results=np.array(mean_results)	
+            best_model_index=mean_results.argmax()
+            best_model=models[best_model_index][1]
+            print("Best Model: ",models[best_model_index][0])
+            self.best_model_str=""
+            self.best_model_str+=models[best_model_index][0]
+        
+        #if dataset is too little
+        else:
+            TrainValSet=dataset #lazy programming just to work
+            TrueErrorSet=dataset #lazy programming just to work
+             # Spot Check Algorithms
+            models = []
+            models.append(('LR', LogisticRegression()))
+            #self.loading=str(20)+'%'
+            models.append(('LDA', LinearDiscriminantAnalysis()))
+            #self.loading=str(30)+'%'
+            models.append(('KNN', KNeighborsClassifier()))
+            #self.loading=str(40)+'%'
+            models.append(('CART', DecisionTreeClassifier()))
+            #self.loading=str(50)+'%'
+            models.append(('NB', GaussianNB()))
+            #self.loading=str(70)+'%'
+            #if(dataset.shape[0]<SVM_data_size):
             models.append(('SVM', svm.SVC()))
-        # evaluate each model in turn
-        self.loading=str(20)+'%'
-        mean_results=[]
-        model_index=0
-        prev_loading=20
-        for name, model in models:
-            kfold = model_selection.KFold(n_splits=cross_val_splits, random_state=seed)
-            cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
-            mean_results.append(cv_results.mean())
-            msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-            print(msg)
-            model_index+=1
-            self.loading=str(prev_loading + 10*model_index)+'%'
-        self.loading=str(90)+'%'    
-        mean_results=np.array(mean_results)	
-        best_model_index=mean_results.argmax()
-        best_model=models[best_model_index][1]
-        print("Best Model: ",models[best_model_index][0])
-        self.best_model_str=""
-        self.best_model_str+=models[best_model_index][0]
-    	
+                
+            best_score_model=(0,KNeighborsClassifier(),'KNN')
+            for name,model in models:
+                print("Test Model: ",name)
+                try:
+                    model.fit(dataset.iloc[:,:class_index],dataset.iloc[:,class_index])
+                    _predictions=model.predict(dataset.iloc[:,:class_index])
+                    _score=accuracy_score(dataset.iloc[:,class_index],_predictions)
+                    if(_score>=best_score_model[0]):
+                        best_score_model=(_score,model,name)
+                except:
+                    print("Error in exception in model fit")
+                    #pass
+                    
+                
+                    
+            
+            best_model=best_score_model[1]
+            self.best_model_str=""
+            self.best_model_str+=best_score_model[2]
+            
+            
         ##Fit best model In Training_validation dataset
         finalArray=TrainValSet.values
         finalX=finalArray[:,:class_index]

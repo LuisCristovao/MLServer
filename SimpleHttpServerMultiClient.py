@@ -340,5 +340,5 @@ def server_static(filepath):
         return "You are not logged in. Access denied."
 
 
-#bt.run(host='localhost', port=80, server='paste')
-bt.run(host='0.0.0.0', port=argv[1], server='paste')
+#bt.run(host='localhost', port=80, server='paste') #to run server locally
+bt.run(host='0.0.0.0', port=argv[1], server='paste') # to run server on heroku
