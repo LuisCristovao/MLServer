@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>Upload Files Server</title>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.8/processing.min.js"></script>
+  
 </head>
 <body>
 <h2>Welcome to the website</h2>
