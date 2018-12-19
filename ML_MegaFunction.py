@@ -190,6 +190,7 @@ class Predictor:
     
     @staticmethod
     def ExportModel(model,path_and_name):
+        print("Exporting Model")
         joblib.dump(model, path_and_name)
    
 

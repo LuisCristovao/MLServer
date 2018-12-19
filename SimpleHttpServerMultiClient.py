@@ -342,7 +342,11 @@ def exportModel():
     for c in clients:
         key = bt.request.get_cookie(clients[c].username, secret=secret)
         if key:
-            newpath = r'files/Template/'+c+'/model.sav' 
+            newpath = r'files/Template/'+c
+            if not os.path.exists(newpath):
+                    os.makedirs(newpath)
+            
+            newpath+='/model.sav'
             clients[c].SaveModel(newpath)
             return bt.static_file('model.sav', root='files/Template/'+c+'/',download=True)
     
