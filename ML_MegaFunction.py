@@ -25,9 +25,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn import preprocessing
+import joblib
 
-
-from sklearn.externals import joblib
+#from sklearn.externals import joblib
 
 class Predictor:
     
